@@ -1,30 +1,31 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import AppLayout from './pages/AppLayout';
-import AuthPage from './pages/AuthPage';
-import Dashboard from './pages/Dashboard';
-import InvoicesPage from './pages/InvoicesPage';
-import CreateInvoicePage from './pages/CreateInvoicePage';
-import InvoiceDetailPage from './pages/InvoiceDetailPage';
-import ProductsPage from './pages/ProductsPage';
-import SettingsPage from './pages/SettingsPage';
-import TransactionsPage from './pages/TransactionsPage';
+import { Routes, Route, Navigate } from 'react-router-dom'
+import { useAuth } from './lib/auth'
+import { AuthPage } from './pages/AuthPage'
+import { AppLayout } from './pages/AppLayout'
+import { Dashboard } from './pages/Dashboard'
+import { TransactionsPage } from './pages/TransactionsPage'
+import { InvoicesPage } from './pages/InvoicesPage'
+import { InvoiceDetailPage } from './pages/InvoiceDetailPage'
+import { CreateInvoicePage } from './pages/CreateInvoicePage'
+import { ProductsPage } from './pages/ProductsPage'
+import { SettingsPage } from './pages/SettingsPage'
 
 export default function App() {
+  const { session, loading } = useAuth()
+  if (loading) return <div className="loading-spinner"><div className="spinner" /></div>
+  if (!session) return <AuthPage />
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/auth" element={<AuthPage />} />
-        <Route path="/" element={<AppLayout />}>
-          <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="invoices" element={<InvoicesPage />} />
-          <Route path="invoices/new" element={<CreateInvoicePage />} />
-          <Route path="invoices/:id" element={<InvoiceDetailPage />} />
-          <Route path="products" element={<ProductsPage />} />
-          <Route path="settings" element={<SettingsPage />} />
-          <Route path="transactions" element={<TransactionsPage />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
-  );
+    <Routes>
+      <Route element={<AppLayout />}>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/transactions" element={<TransactionsPage />} />
+        <Route path="/invoices" element={<InvoicesPage />} />
+        <Route path="/invoices/new" element={<CreateInvoicePage />} />
+        <Route path="/invoices/:id" element={<InvoiceDetailPage />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Route>
+    </Routes>
+  )
 }
