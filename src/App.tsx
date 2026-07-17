@@ -12,19 +12,8 @@ import { SettingsPage } from './pages/SettingsPage'
 
 export default function App() {
   const { session, loading } = useAuth()
-
-  if (loading) {
-    return (
-      <div className="loading-spinner">
-        <div className="spinner" />
-      </div>
-    )
-  }
-
-  if (!session) {
-    return <AuthPage />
-  }
-
+  if (loading) return <div className="loading-spinner"><div className="spinner" /></div>
+  if (!session) return <AuthPage />
   return (
     <Routes>
       <Route element={<AppLayout />}>

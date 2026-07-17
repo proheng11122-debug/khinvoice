@@ -27,31 +27,15 @@ export function formatDate(dateStr: string): string {
   })
 }
 
-export function formatDateTime(dateStr: string): string {
-  if (!dateStr) return ''
-  const d = new Date(dateStr)
-  return d.toLocaleString('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
-
 export function todayISO(): string {
   return new Date().toISOString().split('T')[0]
 }
 
 export function statusColor(status: string): string {
   switch (status) {
-    case 'paid':
-      return '#16a34a'
-    case 'partial':
-      return '#d97706'
-    case 'unpaid':
-      return '#dc2626'
-    default:
-      return '#6b7280'
+    case 'paid': return '#16a34a'
+    case 'partial': return '#d97706'
+    case 'unpaid': return '#dc2626'
+    default: return '#6b7280'
   }
 }

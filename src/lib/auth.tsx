@@ -21,15 +21,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   async function fetchProfile(userId: string) {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .maybeSingle()
-    if (error) {
-      console.error('Profile fetch error:', error)
-      return
-    }
+    const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle()
+    if (error) { console.error('Profile fetch error:', error); return }
     setProfile(data as Profile | null)
   }
 
@@ -45,16 +38,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const { data: listener } = supabase.auth.onAuthStateChange((event, newSession) => {
       setSession(newSession)
-      if (event === 'SIGNED_OUT') {
-        setProfile(null)
-        setLoading(false)
-        return
-      }
+      if (event === 'SIGNED_OUT') { setProfile(null); setLoading(false); return }
       if (newSession?.user) {
-        (async () => {
-          await fetchProfile(newSession.user.id)
-          setLoading(false)
-        })()
+        (async () => { await fetchProfile(newSession.user.id); setLoading(false) })()
       } else {
         setLoading(false)
       }
@@ -67,17 +53,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const email = phoneToEmail(phone)
     const { data, error } = await supabase.auth.signUp({ email, password })
     if (error) return { error: error.message }
-
     if (data.user) {
       const { error: profileError } = await supabase.from('profiles').insert({
-        id: data.user.id,
-        business_name: businessName,
-        username,
-        phone,
+        id: data.user.id, business_name: businessName, username, phone,
       })
       if (profileError) return { error: profileError.message }
     }
-
     return { error: null }
   }
 
@@ -94,9 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function refreshProfile() {
-    if (session?.user) {
-      await fetchProfile(session.user.id)
-    }
+    if (session?.user) { await fetchProfile(session.user.id) }
   }
 
   return (
