@@ -18,7 +18,6 @@ export function ProductsPage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => { loadData() }, [session])
-
   async function loadData() {
     if (!session?.user) return
     const [p, m] = await Promise.all([
@@ -27,16 +26,13 @@ export function ProductsPage() {
     ])
     setProducts(p.data as Product[] || []); setMovements(m.data as any[] || []); setLoading(false)
   }
-
   async function handleAddProduct(e: React.FormEvent) {
     e.preventDefault(); setSaving(true); setError(null)
     const { error } = await supabase.from('products').insert({ user_id: session!.user.id, name: pForm.name, unit: pForm.unit, cost_price: parseFloat(pForm.cost_price) || 0, sell_price: parseFloat(pForm.sell_price) || 0, low_stock_threshold: parseFloat(pForm.low_stock_threshold) || 5, currency: pForm.currency })
     if (error) { setError(error.message); setSaving(false); return }
     setShowProd(false); setPForm({ name: '', unit: 'ដុំ', cost_price: '', sell_price: '', low_stock_threshold: '5', currency: 'USD' }); await loadData(); setSaving(false)
   }
-
   async function handleDeleteProduct(id: string) { if (!confirm('Delete this product?')) return; await supabase.from('products').delete().eq('id', id); await loadData() }
-
   async function handleStock(e: React.FormEvent) {
     e.preventDefault(); setSaving(true); setError(null)
     const qty = parseFloat(sForm.quantity); if (isNaN(qty) || qty <= 0) { setError('Quantity must be > 0'); setSaving(false); return }

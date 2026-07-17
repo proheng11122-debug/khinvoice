@@ -36,7 +36,6 @@ export function CreateInvoicePage() {
     if (field === 'product_id' && value) { const p = products.find(x => x.id === value); if (p) { updated[i].description = p.name; updated[i].unit = p.unit; updated[i].unit_price = String(p.sell_price) } }
     setItems(updated)
   }
-
   const subtotal = items.reduce((s, item) => s + (parseFloat(item.quantity) || 0) * (parseFloat(item.unit_price) || 0), 0)
 
   async function handleSubmit(e: React.FormEvent) {

@@ -16,7 +16,6 @@ export function AppLayout() {
   const navigate = useNavigate()
   async function handleSignOut() { await signOut(); navigate('/') }
   const initials = (profile?.business_name || profile?.username || 'U').charAt(0).toUpperCase()
-
   return (
     <div className="app-layout">
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>

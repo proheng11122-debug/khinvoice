@@ -16,7 +16,6 @@ export function SettingsPage() {
     if (error) setError(error.message); else { setMessage('Profile updated successfully'); await refreshProfile() }
     setSaving(false)
   }
-
   async function handleQRUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]; if (!file) return; setUploading(true); setError(null)
     const ext = file.name.split('.').pop(); const fileName = `${session!.user.id}/qr-code.${ext}`

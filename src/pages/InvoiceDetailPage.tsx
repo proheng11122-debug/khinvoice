@@ -18,7 +18,6 @@ export function InvoiceDetailPage() {
   const [savingPay, setSavingPay] = useState(false)
 
   useEffect(() => { loadData() }, [id, session])
-
   async function loadData() {
     if (!id || !session?.user) return
     const [inv, it, pa, pr] = await Promise.all([
@@ -29,14 +28,12 @@ export function InvoiceDetailPage() {
     ])
     setInvoice(inv.data as Invoice | null); setItems(it.data as InvoiceItem[] || []); setPayments(pa.data as InvoicePayment[] || []); setProfile(pr.data as Profile | null); setLoading(false)
   }
-
   async function handleAddPayment(e: React.FormEvent) {
     e.preventDefault(); setSavingPay(true)
     const amt = parseFloat(payForm.amount); if (isNaN(amt) || amt <= 0) { setSavingPay(false); return }
     await supabase.from('invoice_payments').insert({ invoice_id: id, amount: amt, note: payForm.note || null, payment_date: payForm.payment_date })
     setPayForm({ amount: '', note: '', payment_date: todayISO() }); setShowPay(false); setSavingPay(false); await loadData()
   }
-
   async function handleDeletePay(pid: string) { if (!confirm('Delete this payment?')) return; await supabase.from('invoice_payments').delete().eq('id', pid); await loadData() }
   async function handleDeleteInvoice() { if (!confirm('Delete this entire invoice?')) return; await supabase.from('invoices').delete().eq('id', id); navigate('/invoices') }
 
@@ -62,15 +59,13 @@ export function InvoiceDetailPage() {
       </div>
       {invoice.notes && <div className="card"><h2 className="card-title">Notes</h2><p className="text-sm">{invoice.notes}</p></div>}
       {showPay && (
-        <div className="modal-overlay" onClick={() => setShowPay(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header"><h2 className="modal-title">Add Payment</h2><button className="modal-close" onClick={() => setShowPay(false)}>&times;</button></div>
-            <form onSubmit={handleAddPayment}>
-              <div className="modal-body"><div className="form-group"><label className="form-label">Amount</label><input className="form-input" type="number" step="0.01" min="0.01" value={payForm.amount} onChange={e => setPayForm({ ...payForm, amount: e.target.value })} placeholder={`Max: ${invoice.balance}`} required /></div><div className="form-group"><label className="form-label">Date</label><input className="form-input" type="date" value={payForm.payment_date} onChange={e => setPayForm({ ...payForm, payment_date: e.target.value })} required /></div><div className="form-group"><label className="form-label">Note</label><input className="form-input" value={payForm.note} onChange={e => setPayForm({ ...payForm, note: e.target.value })} placeholder="Optional" /></div></div>
-              <div className="modal-footer"><button type="button" className="btn btn-secondary" onClick={() => setShowPay(false)}>Cancel</button><button type="submit" className="btn btn-primary" disabled={savingPay}>{savingPay ? 'Saving...' : 'Add Payment'}</button></div>
-            </form>
-          </div>
-        </div>
+        <div className="modal-overlay" onClick={() => setShowPay(false)}><div className="modal" onClick={e => e.stopPropagation()}>
+          <div className="modal-header"><h2 className="modal-title">Add Payment</h2><button className="modal-close" onClick={() => setShowPay(false)}>&times;</button></div>
+          <form onSubmit={handleAddPayment}>
+            <div className="modal-body"><div className="form-group"><label className="form-label">Amount</label><input className="form-input" type="number" step="0.01" min="0.01" value={payForm.amount} onChange={e => setPayForm({ ...payForm, amount: e.target.value })} placeholder={`Max: ${invoice.balance}`} required /></div><div className="form-group"><label className="form-label">Date</label><input className="form-input" type="date" value={payForm.payment_date} onChange={e => setPayForm({ ...payForm, payment_date: e.target.value })} required /></div><div className="form-group"><label className="form-label">Note</label><input className="form-input" value={payForm.note} onChange={e => setPayForm({ ...payForm, note: e.target.value })} placeholder="Optional" /></div></div>
+            <div className="modal-footer"><button type="button" className="btn btn-secondary" onClick={() => setShowPay(false)}>Cancel</button><button type="submit" className="btn btn-primary" disabled={savingPay}>{savingPay ? 'Saving...' : 'Add Payment'}</button></div>
+          </form>
+        </div></div>
       )}
     </div>
   )

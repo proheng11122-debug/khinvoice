@@ -20,7 +20,6 @@ export function InvoicesPage() {
   }, [session])
 
   if (loading) return <div className="loading-spinner"><div className="spinner" /></div>
-
   const filtered = filter === 'all' ? invoices : invoices.filter(i => i.status === filter)
   const paid = invoices.reduce((s, i) => s + Number(i.paid_amount), 0)
   const outstanding = invoices.reduce((s, i) => s + Number(i.balance), 0)

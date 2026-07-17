@@ -15,18 +15,14 @@ export function TransactionsPage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => { loadData() }, [session])
-
   async function loadData() {
     if (!session?.user) return
     const [tx, un] = await Promise.all([
       supabase.from('transactions').select('*').eq('user_id', session.user.id).order('transaction_date', { ascending: false }),
       supabase.from('custom_units').select('*').eq('user_id', session.user.id).order('name'),
     ])
-    setTransactions(tx.data as Transaction[] || [])
-    setUnits(un.data as CustomUnit[] || [])
-    setLoading(false)
+    setTransactions(tx.data as Transaction[] || []); setUnits(un.data as CustomUnit[] || []); setLoading(false)
   }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault(); setSaving(true); setError(null)
     const qty = parseFloat(form.quantity), price = parseFloat(form.unit_price)
@@ -36,9 +32,7 @@ export function TransactionsPage() {
     if (error) { setError(error.message); setSaving(false); return }
     setShowModal(false); setForm({ type: 'income', description: '', quantity: '1', unit: '', unit_price: '', currency: 'USD', transaction_date: todayISO() }); await loadData(); setSaving(false)
   }
-
   async function handleDelete(id: string) { if (!confirm('Delete this transaction?')) return; await supabase.from('transactions').delete().eq('id', id); await loadData() }
-
   async function handleAddUnit() {
     const name = prompt('Enter unit name:'); if (!name?.trim()) return
     const { error } = await supabase.from('custom_units').insert({ user_id: session!.user.id, name: name.trim() })
@@ -48,7 +42,6 @@ export function TransactionsPage() {
   const filtered = filter === 'all' ? transactions : transactions.filter(t => t.type === filter)
   const inc = transactions.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0)
   const exp = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0)
-
   if (loading) return <div className="loading-spinner"><div className="spinner" /></div>
 
   return (
@@ -68,22 +61,20 @@ export function TransactionsPage() {
         )}
       </div>
       {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header"><h2 className="modal-title">Add Transaction</h2><button className="modal-close" onClick={() => setShowModal(false)}>&times;</button></div>
-            <form onSubmit={handleSubmit}>
-              <div className="modal-body">
-                {error && <div className="auth-error">{error}</div>}
-                <div className="form-group"><label className="form-label">Type</label><div className="flex gap-2"><button type="button" className={`btn ${form.type === 'income' ? 'btn-success' : 'btn-secondary'}`} onClick={() => setForm({ ...form, type: 'income' })}>Income</button><button type="button" className={`btn ${form.type === 'expense' ? 'btn-danger' : 'btn-secondary'}`} onClick={() => setForm({ ...form, type: 'expense' })}>Expense</button></div></div>
-                <div className="form-group"><label className="form-label">Description</label><input className="form-input" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="e.g. Sold 5 bottles of water" required /></div>
-                <div className="form-row"><div className="form-group"><label className="form-label">Quantity</label><input className="form-input" type="number" step="0.01" min="0.01" value={form.quantity} onChange={e => setForm({ ...form, quantity: e.target.value })} required /></div><div className="form-group"><label className="form-label">Unit <button type="button" className="text-sm" style={{ color: 'var(--primary-600)' }} onClick={handleAddUnit}>+ Add</button></label><select className="form-select" value={form.unit} onChange={e => setForm({ ...form, unit: e.target.value })}><option value="">No unit</option><option value="ដុំ">ដុំ</option><option value="កែវ">កែវ</option><option value="គីឡូ">គីឡូ</option>{units.map(u => <option key={u.id} value={u.name}>{u.name}</option>)}</select></div></div>
-                <div className="form-row"><div className="form-group"><label className="form-label">Unit Price</label><input className="form-input" type="number" step="0.01" min="0.01" value={form.unit_price} onChange={e => setForm({ ...form, unit_price: e.target.value })} required /></div><div className="form-group"><label className="form-label">Currency</label><select className="form-select" value={form.currency} onChange={e => setForm({ ...form, currency: e.target.value as 'USD' | 'KHR' })}><option value="USD">USD</option><option value="KHR">KHR</option></select></div></div>
-                <div className="form-group"><label className="form-label">Date</label><input className="form-input" type="date" value={form.transaction_date} onChange={e => setForm({ ...form, transaction_date: e.target.value })} required /></div>
-              </div>
-              <div className="modal-footer"><button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button><button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Saving...' : 'Save'}</button></div>
-            </form>
-          </div>
-        </div>
+        <div className="modal-overlay" onClick={() => setShowModal(false)}><div className="modal" onClick={e => e.stopPropagation()}>
+          <div className="modal-header"><h2 className="modal-title">Add Transaction</h2><button className="modal-close" onClick={() => setShowModal(false)}>&times;</button></div>
+          <form onSubmit={handleSubmit}>
+            <div className="modal-body">
+              {error && <div className="auth-error">{error}</div>}
+              <div className="form-group"><label className="form-label">Type</label><div className="flex gap-2"><button type="button" className={`btn ${form.type === 'income' ? 'btn-success' : 'btn-secondary'}`} onClick={() => setForm({ ...form, type: 'income' })}>Income</button><button type="button" className={`btn ${form.type === 'expense' ? 'btn-danger' : 'btn-secondary'}`} onClick={() => setForm({ ...form, type: 'expense' })}>Expense</button></div></div>
+              <div className="form-group"><label className="form-label">Description</label><input className="form-input" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="e.g. Sold 5 bottles of water" required /></div>
+              <div className="form-row"><div className="form-group"><label className="form-label">Quantity</label><input className="form-input" type="number" step="0.01" min="0.01" value={form.quantity} onChange={e => setForm({ ...form, quantity: e.target.value })} required /></div><div className="form-group"><label className="form-label">Unit <button type="button" className="text-sm" style={{ color: 'var(--primary-600)' }} onClick={handleAddUnit}>+ Add</button></label><select className="form-select" value={form.unit} onChange={e => setForm({ ...form, unit: e.target.value })}><option value="">No unit</option><option value="ដុំ">ដុំ</option><option value="កែវ">កែវ</option><option value="គីឡូ">គីឡូ</option>{units.map(u => <option key={u.id} value={u.name}>{u.name}</option>)}</select></div></div>
+              <div className="form-row"><div className="form-group"><label className="form-label">Unit Price</label><input className="form-input" type="number" step="0.01" min="0.01" value={form.unit_price} onChange={e => setForm({ ...form, unit_price: e.target.value })} required /></div><div className="form-group"><label className="form-label">Currency</label><select className="form-select" value={form.currency} onChange={e => setForm({ ...form, currency: e.target.value as 'USD' | 'KHR' })}><option value="USD">USD</option><option value="KHR">KHR</option></select></div></div>
+              <div className="form-group"><label className="form-label">Date</label><input className="form-input" type="date" value={form.transaction_date} onChange={e => setForm({ ...form, transaction_date: e.target.value })} required /></div>
+            </div>
+            <div className="modal-footer"><button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button><button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Saving...' : 'Save'}</button></div>
+          </form>
+        </div></div>
       )}
     </div>
   )

@@ -38,27 +38,13 @@ export function AuthPage() {
         <form onSubmit={handleSubmit}>
           {mode === 'signup' && (
             <>
-              <div className="form-group">
-                <label className="form-label">Business Name</label>
-                <input className="form-input" value={businessName} onChange={(e) => setBusinessName(e.target.value)} placeholder="e.g. Sok Pisey Shop" required />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Username</label>
-                <input className="form-input" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="e.g. pisey_shop" />
-              </div>
+              <div className="form-group"><label className="form-label">Business Name</label><input className="form-input" value={businessName} onChange={(e) => setBusinessName(e.target.value)} placeholder="e.g. Sok Pisey Shop" required /></div>
+              <div className="form-group"><label className="form-label">Username</label><input className="form-input" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="e.g. pisey_shop" /></div>
             </>
           )}
-          <div className="form-group">
-            <label className="form-label">Phone Number</label>
-            <input className="form-input" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="e.g. 012345678" required />
-          </div>
-          <div className="form-group">
-            <label className="form-label">Password</label>
-            <input className="form-input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 6 characters" minLength={6} required />
-          </div>
-          <button type="submit" className="btn btn-primary w-full" disabled={loading}>
-            {loading ? 'Please wait...' : mode === 'signin' ? 'Sign In' : 'Create Account'}
-          </button>
+          <div className="form-group"><label className="form-label">Phone Number</label><input className="form-input" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="e.g. 012345678" required /></div>
+          <div className="form-group"><label className="form-label">Password</label><input className="form-input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 6 characters" minLength={6} required /></div>
+          <button type="submit" className="btn btn-primary w-full" disabled={loading}>{loading ? 'Please wait...' : mode === 'signin' ? 'Sign In' : 'Create Account'}</button>
         </form>
       </div>
     </div>
