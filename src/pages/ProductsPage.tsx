@@ -14,25 +14,15 @@ export function ProductsPage() {
   const [movements, setMovements] = useState<StockMovement[]>([])
 
   const [productForm, setProductForm] = useState({
-    name: '',
-    unit: 'ដុំ',
-    cost_price: '',
-    sell_price: '',
-    low_stock_threshold: '5',
-    currency: 'USD' as 'USD' | 'KHR',
+    name: '', unit: 'ដុំ', cost_price: '', sell_price: '', low_stock_threshold: '5', currency: 'USD' as 'USD' | 'KHR',
   })
   const [stockForm, setStockForm] = useState({
-    type: 'in' as 'in' | 'out' | 'adjust',
-    quantity: '',
-    note: '',
-    movement_date: todayISO(),
+    type: 'in' as 'in' | 'out' | 'adjust', quantity: '', note: '', movement_date: todayISO(),
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    loadData()
-  }, [session])
+  useEffect(() => { loadData() }, [session])
 
   async function loadData() {
     if (!session?.user) return
@@ -58,11 +48,7 @@ export function ProductsPage() {
       low_stock_threshold: parseFloat(productForm.low_stock_threshold) || 5,
       currency: productForm.currency,
     })
-    if (error) {
-      setError(error.message)
-      setSaving(false)
-      return
-    }
+    if (error) { setError(error.message); setSaving(false); return }
     setShowProductModal(false)
     setProductForm({ name: '', unit: 'ដុំ', cost_price: '', sell_price: '', low_stock_threshold: '5', currency: 'USD' })
     await loadData()
@@ -80,11 +66,7 @@ export function ProductsPage() {
     setSaving(true)
     setError(null)
     const qty = parseFloat(stockForm.quantity)
-    if (isNaN(qty) || qty <= 0) {
-      setError('Quantity must be greater than 0')
-      setSaving(false)
-      return
-    }
+    if (isNaN(qty) || qty <= 0) { setError('Quantity must be greater than 0'); setSaving(false); return }
     const { error } = await supabase.from('stock_movements').insert({
       product_id: selectedProduct!.id,
       user_id: session!.user.id,
@@ -93,20 +75,14 @@ export function ProductsPage() {
       note: stockForm.note || null,
       movement_date: stockForm.movement_date,
     })
-    if (error) {
-      setError(error.message)
-      setSaving(false)
-      return
-    }
+    if (error) { setError(error.message); setSaving(false); return }
     setShowStockModal(false)
     setStockForm({ type: 'in', quantity: '', note: '', movement_date: todayISO() })
     await loadData()
     setSaving(false)
   }
 
-  if (loading) {
-    return <div className="loading-spinner"><div className="spinner" /></div>
-  }
+  if (loading) return <div className="loading-spinner"><div className="spinner" /></div>
 
   return (
     <div>
@@ -119,41 +95,18 @@ export function ProductsPage() {
       </div>
 
       <div className="flex gap-2 mb-4">
-        <button
-          className={`btn btn-sm ${tab === 'products' ? 'btn-primary' : 'btn-secondary'}`}
-          onClick={() => setTab('products')}
-        >
-          Products
-        </button>
-        <button
-          className={`btn btn-sm ${tab === 'movements' ? 'btn-primary' : 'btn-secondary'}`}
-          onClick={() => setTab('movements')}
-        >
-          Stock Movements
-        </button>
+        <button className={`btn btn-sm ${tab === 'products' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setTab('products')}>Products</button>
+        <button className={`btn btn-sm ${tab === 'movements' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setTab('movements')}>Stock Movements</button>
       </div>
 
       {tab === 'products' ? (
         <div className="card">
           {products.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-state-icon">P</div>
-              <p>No products yet. Click "Add Product" to get started.</p>
-            </div>
+            <div className="empty-state"><div className="empty-state-icon">P</div><p>No products yet. Click "Add Product" to get started.</p></div>
           ) : (
             <div className="table-wrapper">
               <table>
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Unit</th>
-                    <th>Stock Qty</th>
-                    <th>Cost Price</th>
-                    <th>Sell Price</th>
-                    <th>Status</th>
-                    <th></th>
-                  </tr>
-                </thead>
+                <thead><tr><th>Name</th><th>Unit</th><th>Stock Qty</th><th>Cost Price</th><th>Sell Price</th><th>Status</th><th></th></tr></thead>
                 <tbody>
                   {products.map((p) => {
                     const isLow = p.quantity <= p.low_stock_threshold
@@ -167,22 +120,11 @@ export function ProductsPage() {
                         </td>
                         <td>{formatCurrency(Number(p.cost_price), p.currency)}</td>
                         <td>{formatCurrency(Number(p.sell_price), p.currency)}</td>
-                        <td>
-                          <span className={`badge ${p.is_active ? 'badge-success' : 'badge-neutral'}`}>
-                            {p.is_active ? 'Active' : 'Inactive'}
-                          </span>
-                        </td>
+                        <td><span className={`badge ${p.is_active ? 'badge-success' : 'badge-neutral'}`}>{p.is_active ? 'Active' : 'Inactive'}</span></td>
                         <td>
                           <div className="flex gap-2">
-                            <button
-                              className="btn btn-secondary btn-sm"
-                              onClick={() => { setSelectedProduct(p); setShowStockModal(true) }}
-                            >
-                              Stock
-                            </button>
-                            <button className="btn btn-ghost btn-sm" onClick={() => handleDeleteProduct(p.id)}>
-                              <span style={{ color: 'var(--error-600)' }}>Delete</span>
-                            </button>
+                            <button className="btn btn-secondary btn-sm" onClick={() => { setSelectedProduct(p); setShowStockModal(true) }}>Stock</button>
+                            <button className="btn btn-ghost btn-sm" onClick={() => handleDeleteProduct(p.id)}><span style={{ color: 'var(--error-600)' }}>Delete</span></button>
                           </div>
                         </td>
                       </tr>
@@ -196,32 +138,17 @@ export function ProductsPage() {
       ) : (
         <div className="card">
           {movements.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-state-icon">S</div>
-              <p>No stock movements yet.</p>
-            </div>
+            <div className="empty-state"><div className="empty-state-icon">S</div><p>No stock movements yet.</p></div>
           ) : (
             <div className="table-wrapper">
               <table>
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Product</th>
-                    <th>Type</th>
-                    <th>Quantity</th>
-                    <th>Note</th>
-                  </tr>
-                </thead>
+                <thead><tr><th>Date</th><th>Product</th><th>Type</th><th>Quantity</th><th>Note</th></tr></thead>
                 <tbody>
                   {movements.map((m: any) => (
                     <tr key={m.id}>
                       <td>{formatDate(m.movement_date)}</td>
                       <td className="font-semibold">{m.product?.name || '-'}</td>
-                      <td>
-                        <span className={`badge ${m.type === 'in' ? 'badge-success' : m.type === 'out' ? 'badge-error' : 'badge-neutral'}`}>
-                          {m.type}
-                        </span>
-                      </td>
+                      <td><span className={`badge ${m.type === 'in' ? 'badge-success' : m.type === 'out' ? 'badge-error' : 'badge-neutral'}`}>{m.type}</span></td>
                       <td className="font-bold">{m.type === 'out' ? '-' : '+'}{m.quantity}</td>
                       <td>{m.note || '-'}</td>
                     </tr>

@@ -17,9 +17,7 @@ export function InvoiceDetailPage() {
   const [paymentForm, setPaymentForm] = useState({ amount: '', note: '', payment_date: todayISO() })
   const [savingPayment, setSavingPayment] = useState(false)
 
-  useEffect(() => {
-    loadData()
-  }, [id, session])
+  useEffect(() => { loadData() }, [id, session])
 
   async function loadData() {
     if (!id || !session?.user) return
@@ -40,15 +38,9 @@ export function InvoiceDetailPage() {
     e.preventDefault()
     setSavingPayment(true)
     const amount = parseFloat(paymentForm.amount)
-    if (isNaN(amount) || amount <= 0) {
-      setSavingPayment(false)
-      return
-    }
+    if (isNaN(amount) || amount <= 0) { setSavingPayment(false); return }
     await supabase.from('invoice_payments').insert({
-      invoice_id: id,
-      amount,
-      note: paymentForm.note || null,
-      payment_date: paymentForm.payment_date,
+      invoice_id: id, amount, note: paymentForm.note || null, payment_date: paymentForm.payment_date,
     })
     setPaymentForm({ amount: '', note: '', payment_date: todayISO() })
     setShowPaymentModal(false)
@@ -68,9 +60,7 @@ export function InvoiceDetailPage() {
     navigate('/invoices')
   }
 
-  if (loading) {
-    return <div className="loading-spinner"><div className="spinner" /></div>
-  }
+  if (loading) return <div className="loading-spinner"><div className="spinner" /></div>
 
   if (!invoice) {
     return (
@@ -87,12 +77,7 @@ export function InvoiceDetailPage() {
         <div>
           <h1 className="page-title">Invoice #{invoice.invoice_number}</h1>
           <p className="page-subtitle">
-            <span
-              className="badge"
-              style={{ background: `${statusColor(invoice.status)}15`, color: statusColor(invoice.status) }}
-            >
-              {invoice.status}
-            </span>
+            <span className="badge" style={{ background: `${statusColor(invoice.status)}15`, color: statusColor(invoice.status) }}>{invoice.status}</span>
           </p>
         </div>
         <div className="flex gap-2">
@@ -101,7 +86,7 @@ export function InvoiceDetailPage() {
         </div>
       </div>
 
-      <div className="card mb-4" style={{ marginBottom: 24 }}>
+      <div className="card" style={{ marginBottom: 24 }}>
         <div className="form-row" style={{ gridTemplateColumns: '1fr 1fr' }}>
           <div>
             <div className="text-sm text-secondary mb-2">From</div>
@@ -115,33 +100,17 @@ export function InvoiceDetailPage() {
           </div>
         </div>
         <div className="form-row mt-4" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
-          <div>
-            <div className="text-sm text-secondary">Invoice Date</div>
-            <div className="font-semibold">{formatDate(invoice.invoice_date)}</div>
-          </div>
-          <div>
-            <div className="text-sm text-secondary">Due Date</div>
-            <div className="font-semibold">{invoice.due_date ? formatDate(invoice.due_date) : '-'}</div>
-          </div>
-          <div>
-            <div className="text-sm text-secondary">Currency</div>
-            <div className="font-semibold">{invoice.currency}</div>
-          </div>
+          <div><div className="text-sm text-secondary">Invoice Date</div><div className="font-semibold">{formatDate(invoice.invoice_date)}</div></div>
+          <div><div className="text-sm text-secondary">Due Date</div><div className="font-semibold">{invoice.due_date ? formatDate(invoice.due_date) : '-'}</div></div>
+          <div><div className="text-sm text-secondary">Currency</div><div className="font-semibold">{invoice.currency}</div></div>
         </div>
       </div>
 
-      <div className="card mb-4" style={{ marginBottom: 24 }}>
+      <div className="card" style={{ marginBottom: 24 }}>
         <h2 className="card-title">Items</h2>
         <div className="table-wrapper">
           <table>
-            <thead>
-              <tr>
-                <th>Description</th>
-                <th>Qty</th>
-                <th>Unit Price</th>
-                <th>Total</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Description</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead>
             <tbody>
               {items.map((item) => (
                 <tr key={item.id}>
@@ -160,7 +129,7 @@ export function InvoiceDetailPage() {
         </div>
       </div>
 
-      <div className="card mb-4" style={{ marginBottom: 24 }}>
+      <div className="card" style={{ marginBottom: 24 }}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="card-title" style={{ margin: 0 }}>Payments</h2>
           <button className="btn btn-primary btn-sm" onClick={() => setShowPaymentModal(true)}>+ Add Payment</button>
@@ -184,25 +153,14 @@ export function InvoiceDetailPage() {
         {payments.length > 0 && (
           <div className="table-wrapper mt-4">
             <table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Amount</th>
-                  <th>Note</th>
-                  <th></th>
-                </tr>
-              </thead>
+              <thead><tr><th>Date</th><th>Amount</th><th>Note</th><th></th></tr></thead>
               <tbody>
                 {payments.map((pay) => (
                   <tr key={pay.id}>
                     <td>{formatDate(pay.payment_date)}</td>
                     <td className="text-success font-bold">{formatCurrency(Number(pay.amount), invoice.currency)}</td>
                     <td>{pay.note || '-'}</td>
-                    <td>
-                      <button className="btn btn-ghost btn-sm" onClick={() => handleDeletePayment(pay.id)}>
-                        <span style={{ color: 'var(--error-600)' }}>Delete</span>
-                      </button>
-                    </td>
+                    <td><button className="btn btn-ghost btn-sm" onClick={() => handleDeletePayment(pay.id)}><span style={{ color: 'var(--error-600)' }}>Delete</span></button></td>
                   </tr>
                 ))}
               </tbody>
@@ -229,42 +187,20 @@ export function InvoiceDetailPage() {
               <div className="modal-body">
                 <div className="form-group">
                   <label className="form-label">Amount</label>
-                  <input
-                    className="form-input"
-                    type="number"
-                    step="0.01"
-                    min="0.01"
-                    value={paymentForm.amount}
-                    onChange={(e) => setPaymentForm({ ...paymentForm, amount: e.target.value })}
-                    placeholder={`Max: ${invoice.balance}`}
-                    required
-                  />
+                  <input className="form-input" type="number" step="0.01" min="0.01" value={paymentForm.amount} onChange={(e) => setPaymentForm({ ...paymentForm, amount: e.target.value })} placeholder={`Max: ${invoice.balance}`} required />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Date</label>
-                  <input
-                    className="form-input"
-                    type="date"
-                    value={paymentForm.payment_date}
-                    onChange={(e) => setPaymentForm({ ...paymentForm, payment_date: e.target.value })}
-                    required
-                  />
+                  <input className="form-input" type="date" value={paymentForm.payment_date} onChange={(e) => setPaymentForm({ ...paymentForm, payment_date: e.target.value })} required />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Note</label>
-                  <input
-                    className="form-input"
-                    value={paymentForm.note}
-                    onChange={(e) => setPaymentForm({ ...paymentForm, note: e.target.value })}
-                    placeholder="Optional"
-                  />
+                  <input className="form-input" value={paymentForm.note} onChange={(e) => setPaymentForm({ ...paymentForm, note: e.target.value })} placeholder="Optional" />
                 </div>
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowPaymentModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary" disabled={savingPayment}>
-                  {savingPayment ? 'Saving...' : 'Add Payment'}
-                </button>
+                <button type="submit" className="btn btn-primary" disabled={savingPayment}>{savingPayment ? 'Saving...' : 'Add Payment'}</button>
               </div>
             </form>
           </div>

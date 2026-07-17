@@ -1,9 +1,10 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import type { Session } from '@supabase/supabase-js'
 import { supabase, Profile } from './supabase'
 import { phoneToEmail } from './utils'
 
 type AuthContextType = {
-  session: import('@supabase/supabase-js').Session | null
+  session: Session | null
   profile: Profile | null
   loading: boolean
   signUp: (phone: string, password: string, businessName: string, username: string) => Promise<{ error: string | null }>
@@ -15,7 +16,7 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<import('@supabase/supabase-js').Session | null>(null)
+  const [session, setSession] = useState<Session | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
 

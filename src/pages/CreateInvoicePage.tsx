@@ -80,18 +80,10 @@ export function CreateInvoicePage() {
     setSaving(true)
     setError(null)
 
-    if (!form.customer_name.trim()) {
-      setError('Customer name is required')
-      setSaving(false)
-      return
-    }
+    if (!form.customer_name.trim()) { setError('Customer name is required'); setSaving(false); return }
 
     const validItems = items.filter((i) => i.description.trim() && parseFloat(i.quantity) > 0 && parseFloat(i.unit_price) >= 0)
-    if (validItems.length === 0) {
-      setError('Add at least one line item with a description and quantity')
-      setSaving(false)
-      return
-    }
+    if (validItems.length === 0) { setError('Add at least one line item with a description and quantity'); setSaving(false); return }
 
     const { data: invoiceData, error: invError } = await supabase.from('invoices').insert({
       user_id: session!.user.id,
@@ -105,11 +97,7 @@ export function CreateInvoicePage() {
       status: 'unpaid',
     }).select().single()
 
-    if (invError || !invoiceData) {
-      setError(invError?.message || 'Failed to create invoice')
-      setSaving(false)
-      return
-    }
+    if (invError || !invoiceData) { setError(invError?.message || 'Failed to create invoice'); setSaving(false); return }
 
     const itemInserts = validItems.map((item) => ({
       invoice_id: invoiceData.id,
@@ -121,18 +109,12 @@ export function CreateInvoicePage() {
     }))
 
     const { error: itemsError } = await supabase.from('invoice_items').insert(itemInserts)
-    if (itemsError) {
-      setError(itemsError.message)
-      setSaving(false)
-      return
-    }
+    if (itemsError) { setError(itemsError.message); setSaving(false); return }
 
     navigate(`/invoices/${invoiceData.id}`)
   }
 
-  if (loading) {
-    return <div className="loading-spinner"><div className="spinner" /></div>
-  }
+  if (loading) return <div className="loading-spinner"><div className="spinner" /></div>
 
   return (
     <div>
@@ -144,73 +126,45 @@ export function CreateInvoicePage() {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <div className="card mb-4" style={{ marginBottom: 24 }}>
+        <div className="card" style={{ marginBottom: 24 }}>
           <h2 className="card-title">Customer Details</h2>
           {error && <div className="auth-error">{error}</div>}
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">Customer Name *</label>
-              <input
-                className="form-input"
-                value={form.customer_name}
-                onChange={(e) => setForm({ ...form, customer_name: e.target.value })}
-                required
-              />
+              <input className="form-input" value={form.customer_name} onChange={(e) => setForm({ ...form, customer_name: e.target.value })} required />
             </div>
             <div className="form-group">
               <label className="form-label">Customer Phone</label>
-              <input
-                className="form-input"
-                value={form.customer_phone}
-                onChange={(e) => setForm({ ...form, customer_phone: e.target.value })}
-              />
+              <input className="form-input" value={form.customer_phone} onChange={(e) => setForm({ ...form, customer_phone: e.target.value })} />
             </div>
           </div>
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">Invoice Date</label>
-              <input
-                className="form-input"
-                type="date"
-                value={form.invoice_date}
-                onChange={(e) => setForm({ ...form, invoice_date: e.target.value })}
-              />
+              <input className="form-input" type="date" value={form.invoice_date} onChange={(e) => setForm({ ...form, invoice_date: e.target.value })} />
             </div>
             <div className="form-group">
               <label className="form-label">Due Date</label>
-              <input
-                className="form-input"
-                type="date"
-                value={form.due_date}
-                onChange={(e) => setForm({ ...form, due_date: e.target.value })}
-              />
+              <input className="form-input" type="date" value={form.due_date} onChange={(e) => setForm({ ...form, due_date: e.target.value })} />
             </div>
           </div>
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">Currency</label>
-              <select
-                className="form-select"
-                value={form.currency}
-                onChange={(e) => setForm({ ...form, currency: e.target.value as 'USD' | 'KHR' })}
-              >
+              <select className="form-select" value={form.currency} onChange={(e) => setForm({ ...form, currency: e.target.value as 'USD' | 'KHR' })}>
                 <option value="USD">USD</option>
                 <option value="KHR">KHR</option>
               </select>
             </div>
             <div className="form-group">
               <label className="form-label">Notes</label>
-              <input
-                className="form-input"
-                value={form.notes}
-                onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                placeholder="Optional notes"
-              />
+              <input className="form-input" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="Optional notes" />
             </div>
           </div>
         </div>
 
-        <div className="card mb-4" style={{ marginBottom: 24 }}>
+        <div className="card" style={{ marginBottom: 24 }}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="card-title" style={{ margin: 0 }}>Line Items</h2>
             <button type="button" className="btn btn-secondary btn-sm" onClick={addItem}>+ Add Item</button>
@@ -220,54 +174,22 @@ export function CreateInvoicePage() {
             <div key={index} className="invoice-item-row">
               <div>
                 {products.length > 0 && (
-                  <select
-                    className="form-select"
-                    style={{ marginBottom: 4 }}
-                    value={item.product_id || ''}
-                    onChange={(e) => updateItem(index, 'product_id', e.target.value)}
-                  >
+                  <select className="form-select" style={{ marginBottom: 4 }} value={item.product_id || ''} onChange={(e) => updateItem(index, 'product_id', e.target.value)}>
                     <option value="">No product link</option>
-                    {products.map((p) => (
-                      <option key={p.id} value={p.id}>{p.name}</option>
-                    ))}
+                    {products.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
                   </select>
                 )}
-                <input
-                  className="form-input"
-                  placeholder="Description"
-                  value={item.description}
-                  onChange={(e) => updateItem(index, 'description', e.target.value)}
-                />
+                <input className="form-input" placeholder="Description" value={item.description} onChange={(e) => updateItem(index, 'description', e.target.value)} />
               </div>
-              <input
-                className="form-input"
-                type="number"
-                step="0.01"
-                placeholder="Qty"
-                value={item.quantity}
-                onChange={(e) => updateItem(index, 'quantity', e.target.value)}
-              />
-              <select
-                className="form-select"
-                value={item.unit}
-                onChange={(e) => updateItem(index, 'unit', e.target.value)}
-              >
+              <input className="form-input" type="number" step="0.01" placeholder="Qty" value={item.quantity} onChange={(e) => updateItem(index, 'quantity', e.target.value)} />
+              <select className="form-select" value={item.unit} onChange={(e) => updateItem(index, 'unit', e.target.value)}>
                 <option value="">No unit</option>
                 <option value="ដុំ">ដុំ</option>
                 <option value="កែវ">កែវ</option>
                 <option value="គីឡូ">គីឡូ</option>
-                {units.map((u) => (
-                  <option key={u.id} value={u.name}>{u.name}</option>
-                ))}
+                {units.map((u) => <option key={u.id} value={u.name}>{u.name}</option>)}
               </select>
-              <input
-                className="form-input"
-                type="number"
-                step="0.01"
-                placeholder="Unit Price"
-                value={item.unit_price}
-                onChange={(e) => updateItem(index, 'unit_price', e.target.value)}
-              />
+              <input className="form-input" type="number" step="0.01" placeholder="Unit Price" value={item.unit_price} onChange={(e) => updateItem(index, 'unit_price', e.target.value)} />
               <button type="button" className="btn btn-ghost btn-sm" onClick={() => removeItem(index)}>
                 <span style={{ color: 'var(--error-600)' }}>Remove</span>
               </button>
@@ -282,9 +204,7 @@ export function CreateInvoicePage() {
 
         <div className="flex gap-2">
           <button type="button" className="btn btn-secondary" onClick={() => navigate('/invoices')}>Cancel</button>
-          <button type="submit" className="btn btn-primary" disabled={saving}>
-            {saving ? 'Creating...' : 'Create Invoice'}
-          </button>
+          <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Creating...' : 'Create Invoice'}</button>
         </div>
       </form>
     </div>
